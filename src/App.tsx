@@ -1,0 +1,7 @@
+import {Route,Routes} from 'react-router-dom';import {Provider} from './store';import Layout from './components/Layout'
+import Home from './pages/Home';import Explore from './pages/Explore';import Detail from './pages/Detail';import Info from './pages/Info';import Pricing from './pages/Pricing';import Book from './pages/Book';import {Auth,Dashboard} from './pages/Auth'
+import AdminLayout,{Dash,Interests,Appts,Customers,Settings} from './admin/Admin';import {AdminOpps,OppForm} from './admin/AdminOpps'
+export default function App(){return <Provider><Routes><Route path="admin" element={<AdminLayout/>}><Route index element={<Dash/>}/><Route path="opportunities" element={<AdminOpps/>}/><Route path="opportunities/:id" element={<OppForm/>}/><Route path="interests" element={<Interests/>}/><Route path="appointments" element={<Appts/>}/><Route path="customers" element={<Customers/>}/><Route path="settings" element={<Settings/>}/></Route>
+ <Route element={<Layout/>}><Route index element={<Home/>}/><Route path="explore" element={<Explore/>}/><Route path="explore/:id" element={<Detail/>}/><Route path="pricing" element={<Pricing/>}/><Route path="book/:id" element={<Book/>}/>
+ <Route path="signin" element={<Auth/>}/><Route path="signup" element={<Auth up/>}/><Route path="dashboard" element={<Dashboard/>}/>
+ {['how-it-works','islamic-finance','about','governance','faq','contact','privacy','terms','risk'].map(s=><Route key={s} path={s} element={<Info slug={s}/>}/>)}<Route path="*" element={<Info slug="about"/>}/></Route></Routes></Provider>}

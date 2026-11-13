@@ -1,0 +1,11 @@
+import {useState} from 'react';import OppCard from '../components/OppCard';import {useApi,CATS} from '../api'
+export default function Explore(){const {data,loading,err}=useApi<any[]>('/opportunities');const [q,setQ]=useState(''),[cat,setCat]=useState(''),[arr,setArr]=useState(''),[maxMin,setMaxMin]=useState(''),[avail,setAvail]=useState(false),[sort,setSort]=useState('featured')
+ const list=(data||[]).filter(o=>(o.title+o.category).toLowerCase().includes(q.toLowerCase())&&(!cat||o.category===cat)&&(!arr||o.arrangement===arr)&&(!maxMin||o.min<=Number(maxMin))&&(!avail||['Published and Accepting Interest','Funding in Progress'].includes(o.status))).sort((a,b)=>sort==='target'?b.target-a.target:sort==='min'?a.min-b.min:0)
+ const reset=()=>{setQ('');setCat('');setArr('');setMaxMin('');setAvail(false);setSort('featured')}
+ return <><div className="pagehead"><h1>Investment Opportunities</h1><p>Sample records are labeled. Capital may be at risk; returns are not guaranteed.</p></div><section className="sec"><div className="filters"><label>Search<input value={q} onChange={e=>setQ(e.target.value)}/></label>
+ <label>Category<select value={cat} onChange={e=>setCat(e.target.value)}><option value="">All</option>{CATS.map(c=><option key={c}>{c}</option>)}</select></label>
+ <label>Funding<select value={arr} onChange={e=>setArr(e.target.value)}><option value="">Any</option><option value="single">Single investor</option><option value="multi">Multiple investors</option></select></label>
+ <label>Max minimum ($)<input type="number" value={maxMin} onChange={e=>setMaxMin(e.target.value)}/></label>
+ <label className="chk"><input type="checkbox" checked={avail} onChange={e=>setAvail(e.target.checked)}/> Accepting interest</label>
+ <label>Sort<select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Featured</option><option value="target">Largest target</option><option value="min">Lowest minimum</option></select></label><button className="btn ghost" onClick={reset}>Reset</button></div>
+ {loading&&<p>Loading…</p>}{err&&<p className="err">{err}</p>}{!loading&&!err&&(list.length?<div className="grid">{list.map(o=><OppCard key={o.id} o={o}/>)}</div>:<p className="empty">No opportunities match.</p>)}</section></>}

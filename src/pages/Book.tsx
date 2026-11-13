@@ -1,0 +1,9 @@
+import {useState} from 'react';import {Link,useParams} from 'react-router-dom';import {api,useApi} from '../api';import {useApp} from '../store'
+export default function Book(){const {id}=useParams();const {me,S}=useApp();const {data,loading,err,reload}=useApi<any>(me?'/slots':null);const [sel,setSel]=useState(''),[e,setE]=useState(''),[done,setDone]=useState<any>(null)
+ if(!me)return <section className="sec"><Link className="btn" to="/signin">Sign in to book</Link></section>
+ if(done)return <section className="sec narrow"><div className="panel"><h1>Appointment booked</h1><p>Reference: <b>{done.ref}</b><br/>When: {done.start.replace('T',' ')} (office local time)<br/>Where: {done.office}<br/>Contact: {S.email||'—'} {S.phone}</p><p className="note">Bring ID if requested by our team. Email notifications are not configured in this version, so no email was sent.</p><Link className="btn" to="/dashboard">My dashboard</Link></div></section>
+ const by:Record<string,string[]>={};data?.slots.forEach((s:string)=>(by[s.slice(0,10)]??=[]).push(s))
+ const book=async()=>{setE('');try{setDone(await api('/appointments','POST',{interestId:Number(id),start:sel}))}catch(x:any){setE(x.message);setSel('');reload()}}
+ return <section className="sec narrow"><h1>Book an appointment</h1><p>Duration: {data?.minutes||30} minutes at {S.office_address}</p>{loading&&<p>Loading…</p>}{err&&<p className="err">{err}</p>}
+ {Object.entries(by).map(([d,l])=><div key={d} className="panel"><b>{d}</b><div className="row">{l.map(s=><button key={s} className={'btn '+(sel===s?'':'ghost')} onClick={()=>setSel(s)}>{s.slice(11)}</button>)}</div></div>)}
+ {!loading&&!Object.keys(by).length&&<p className="empty">No slots currently available.</p>}{e&&<p className="err" role="alert">{e}</p>}<button className="btn" disabled={!sel} onClick={book}>Confirm {sel&&sel.replace('T',' ')}</button></section>}
